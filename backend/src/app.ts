@@ -3,9 +3,13 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import connectDB from './database/init_db';
 
 // 加载环境变量
 dotenv.config();
+
+// 连接数据库
+connectDB();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
