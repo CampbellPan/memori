@@ -140,6 +140,16 @@ const Album: React.FC = () => {
         }
     };
 
+    function handleLogout() {
+        // 清除 localStorage 中的 Token
+        localStorage.removeItem('token');
+
+        // 重定向到登录页或首页
+        alert('已成功登出');
+        window.location.href = '/';
+    }
+
+
     return (
         <div className="flex">
             {/* 侧边栏 */}
@@ -158,7 +168,8 @@ const Album: React.FC = () => {
                         onClick={() => navigate('/')}>
                         <FaHome className="mr-2" /> Home
                     </button>
-                    <button className="flex items-center w-full text-left hover:bg-amber-500 rounded-full p-2 transition-colors duration-300">
+                    <button className="flex items-center w-full text-left hover:bg-amber-500 rounded-full p-2 transition-colors duration-300"
+                     onClick={handleLogout}>
                         <FaSignOutAlt className="mr-2" /> Logout
                     </button>
                     <button className="flex items-center w-full text-left hover:bg-amber-500 rounded-full p-2 transition-colors duration-300">

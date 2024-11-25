@@ -20,11 +20,11 @@ app.use(helmet());             // 安全中间件
 app.use(morgan('dev'));        // 日志中间件
 app.use(express.json());       // 解析 JSON 请求体
 app.use(express.urlencoded({ extended: true })); // 解析 URL 编码的请求体
+app.use(express.static('public')); // 静态资源目录
 
 // 基础路由
-app.get('/', (req: Request, res: Response) => {
-  res.json({ message: '服务器运行正常' });
-});
+import routes from './routes/routes';
+app.use("/", routes);
 
 // API 路由
 // TODO: 在这里添加你的 API 路由
