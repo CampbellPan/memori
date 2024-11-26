@@ -4,12 +4,24 @@ interface AuthContextType {
   isLoggedIn: boolean;
   login: (token: string) => void;
   logout: () => void;
+
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsLoggedIn(true);
+    }
+    setIsLoading(false); // 加载完成
+  }, []);
+
 
   useEffect(() => {
     // 检查 localStorage 是否存在 token
@@ -29,7 +41,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

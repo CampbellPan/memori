@@ -3,6 +3,7 @@ import { FaFolderPlus, FaSignOutAlt, FaCog, FaPlus, FaHome } from 'react-icons/f
 import { FaArrowLeft, FaArrowRight, FaTimes } from 'react-icons/fa';
 import { IoIosSearch } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Modal from 'react-modal';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'; // 引入库
 
@@ -35,12 +36,44 @@ const dummyData = [
 ];
 
 const Album: React.FC = () => {
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+
     const [photos, setPhotos] = useState(dummyData.slice(0, 12)); // 初始显示12张
     const [currentIndex, setCurrentIndex] = useState(12); // 当前显示的照片索引
     const [allLoaded, setAllLoaded] = useState(false); // 是否已加载所有照片
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
     const navigate = useNavigate();
+
+    const { userId } = useParams<{ userId: string }>(); // 从 URL 中获取 userId 参数
+    const [userData, setUserData] = useState<{ username: string; avatar: string } | null>(null); // 用户数据
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await fetch(`${apiBaseUrl}/api/user/${userId}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setUserData({ username: data.username, avatar: data.avatar });
+
+                    console.log("userData是", userData); // 查看 avatar 字段的值
+
+                } else {
+                    console.error('Failed to fetch user data');
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        if (userId) {
+            fetchUserData();
+        }
+    }, [userId, apiBaseUrl]);
 
     const photoContainerRef = useRef<HTMLDivElement>(null);
     //useRef是React提供的一个钩子，用于创建一个引用，这个引用可以指向一个DOM元素
@@ -155,8 +188,14 @@ const Album: React.FC = () => {
             {/* 侧边栏 */}
             <div className="w-[240px] bg-sidebar p-4 flex flex-col justify-between h-screen sticky top-0 font-title">
                 <div className="flex flex-col items-center">
-                    <img src="avatar.jpg" alt="Profile" className="rounded-full mt-10 w-32 h-32 mb-4" />
-                    <h2 className="text-2xl mb-10">RainMan96</h2>
+                    {userData ? (
+                        <>
+                            <img src={`/${userData.avatar}`} alt="Profile" className="rounded-full mt-10 w-32 h-32 mb-4" />
+                            <h2 className="text-2xl mb-10">{userData.username}</h2>
+                        </>
+                    ) : (
+                        <p>Loading...</p>
+                    )}
                     <div className="text-lg w-full">
                         <button className="flex items-center mb-2 w-full text-left hover:bg-amber-500 rounded-full p-2 transition-colors duration-300">
                             <FaFolderPlus className="mr-2" /> Create new folder
@@ -169,7 +208,7 @@ const Album: React.FC = () => {
                         <FaHome className="mr-2" /> Home
                     </button>
                     <button className="flex items-center w-full text-left hover:bg-amber-500 rounded-full p-2 transition-colors duration-300"
-                     onClick={handleLogout}>
+                        onClick={handleLogout}>
                         <FaSignOutAlt className="mr-2" /> Logout
                     </button>
                     <button className="flex items-center w-full text-left hover:bg-amber-500 rounded-full p-2 transition-colors duration-300">
