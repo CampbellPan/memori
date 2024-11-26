@@ -16,6 +16,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token); // 如果 token 存在，设置 isLoggedIn 为 true
   }, []);
+  // 连续两个感叹号 !! 是将一个值转换为布尔值的常用方式
 
   const login = (token: string) => {
     localStorage.setItem('token', token); // 将 token 存储到 localStorage

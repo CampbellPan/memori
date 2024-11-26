@@ -37,6 +37,9 @@ router.post('/login', async (req, res) => {
       process.env.JWT_SECRET!,
       { expiresIn: '1h' } // 设置过期时间为1小时
     );
+    //感叹号（!）是非空断言操作符，它告诉 TypeScript 该值不会为空，因此可以安全地访问该值的属性。
+    //在这里，我们知道 process.env.JWT_SECRET 一定会有值，因为我们在 .env 文件中设置了它，所以我们可以放心地使用非空断言操作符。
+    //JWT的生成是使用
 
     // 返回 Token
     res.status(200).json({ token });

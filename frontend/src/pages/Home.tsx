@@ -3,6 +3,7 @@ import { FaTimes } from 'react-icons/fa';
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLocation } from 'react-router-dom';
 
 const Home: React.FC = () => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -19,6 +20,9 @@ const Home: React.FC = () => {
   const newUsernameRef = useRef<HTMLInputElement>(null);
   const newEmailRef = useRef<HTMLInputElement>(null);
   const newPasswordRef = useRef<HTMLInputElement>(null);
+
+  const location = useLocation();
+  const message = location.state?.message || '';
   
 
 
@@ -149,10 +153,32 @@ const Home: React.FC = () => {
     console.log('已退出登录, isLoggedIn:', isLoggedIn); // 注意这里的 isLoggedIn 是异步更新的
     alert('已退出登录');
   }
+
+  function handleAlbum() {
+    // 获取token中的用户信息
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('请先登录');
+      return;
+    }
+
+    // 解析token
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(atob(base64));
+    //atob() 方法是JavaScript 内置的全局方法，用于将 Base64 编码的字符串解码为普通字符串。
+    const userId = payload.userId;
+    if (userId) {
+      navigate(`/album/${userId}`);
+    } else {
+      alert('无法获取用户ID，请重新登录！');
+    }
+  }
   
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-between">
+      {message && <p className="text-amber-200 bg-gray-600 text-center">{message}</p>}
       {/* 顶部导航栏 */}
       <nav className="bg-gray-800 p-4">
         <div className="container font-title mx-auto flex justify-end space-x-8">
@@ -164,7 +190,7 @@ const Home: React.FC = () => {
             <>
               <button
                 className="text-amber-500 hover:text-amber-300"
-                onClick={() => navigate('/album')}
+                onClick={handleAlbum}
               >
                 Album
               </button>
